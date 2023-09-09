@@ -6,6 +6,7 @@ import {MultiSigWallet} from "../../src/multi-sig/MultiSig.sol";
 contract AuthTest is Test {
     MultiSigWallet public multiSig;
     address[4] public users;
+    Counter counter;
 
     function setUp() public {
         _createUsers();
@@ -16,6 +17,15 @@ contract AuthTest is Test {
         owners[2] = users[2];
 
         multiSig = new MultiSigWallet(owners, owners.length - 1);
+
+        // Deploy helper contracts
+        counter = new Counter();
+
+        assertEq(
+            counter.count(),
+            uint256(0),
+            "Counter should start with 0 count"
+        );
     }
 
     function testOwners() public {
@@ -27,13 +37,6 @@ contract AuthTest is Test {
     }
 
     function testCounterTransaction() public {
-        Counter counter = new Counter();
-        assertEq(
-            counter.count(),
-            uint256(0),
-            "Counter should start with 0 count"
-        );
-
         // User 0 proposes the transaction and confirms it
         vm.startPrank(users[0]);
         multiSig.submitTransaction(
@@ -58,6 +61,17 @@ contract AuthTest is Test {
         //Check if we cannot run the transaction for the second time
         vm.expectRevert();
         multiSig.executeTransaction(0);
+        vm.stopPrank();
+    }
+
+    function testNotOwnerCannotProposeTransactions() public {
+        vm.startPrank(users[3]);
+        vm.expectRevert();
+        multiSig.submitTransaction(
+            address(counter),
+            0,
+            abi.encodeWithSelector(Counter.add.selector)
+        );
         vm.stopPrank();
     }
 
