@@ -75,6 +75,28 @@ contract AuthTest is Test {
         vm.stopPrank();
     }
 
+    function testTransactionRevertsIfNotEnoughApprovals() public {
+        // User 0 proposes the transaction, confirms it and tries to execute
+        vm.startPrank(users[0]);
+        multiSig.submitTransaction(
+            address(counter),
+            0,
+            abi.encodeWithSelector(Counter.add.selector)
+        );
+        assertEq(multiSig.getTransactionCount(), 1, "Transaction not added");
+
+        multiSig.confirmTransaction(0);
+
+        vm.expectRevert();
+        multiSig.executeTransaction(0);
+
+        assertEq(counter.count(), uint256(0));
+        (, , , bool executed, ) = multiSig.getTransaction(0);
+        assertEq(executed, false);
+
+        vm.stopPrank();
+    }
+
     // --- Internal Functions ---
     function _createUsers() internal {
         users[0] = address(1);
