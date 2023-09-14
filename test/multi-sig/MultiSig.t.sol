@@ -3,7 +3,7 @@ pragma solidity ^0.8.18;
 import "forge-std/Test.sol";
 import {MultiSigWallet} from "../../src/multi-sig/MultiSig.sol";
 
-contract AuthTest is Test {
+contract MultiSig is Test {
     MultiSigWallet public multiSig;
     address[4] public users;
     Counter counter;
