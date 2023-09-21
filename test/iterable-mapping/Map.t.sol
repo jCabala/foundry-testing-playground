@@ -11,13 +11,13 @@ contract MapTest is Test {
 
     function setUp(address[] memory _keys) public {
         // Checking if keys are different and no longer than 200
-        vm.assume(keys.length < 200);
+        //    vm.assume(keys.length < 200);
 
-        for (uint i = 0; i < keys.length; i++) {
-            for (uint j = i + 1; j < keys.length; j++) {
-                vm.assume(keys[i] != keys[j]);
-            }
-        }
+        //        for (uint i = 0; i < keys.length; i++) {
+        //           for (uint j = i + 1; j < keys.length; j++) {
+        //              vm.assume(keys[i] != keys[j]);
+        //         }
+        //    }
 
         keys = _keys;
 
@@ -35,6 +35,14 @@ contract MapTest is Test {
         for (uint i = 0; i < keys.length; i++) {
             uint val = map.get(keys[i]);
             assertEq(val, i);
+        }
+    }
+
+    function testGetKeyAtIndex() public {
+        for (uint i = 0; i < keys.length; i++) {
+            address key = map.getKeyAtIndex(i);
+
+            assertEq(key, keys[i]);
         }
     }
 }
